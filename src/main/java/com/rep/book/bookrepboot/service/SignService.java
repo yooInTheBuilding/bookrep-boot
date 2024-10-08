@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.rep.book.bookrepboot.APIKEY;
 import com.rep.book.bookrepboot.util.SecurityUtil;
 import jakarta.servlet.http.HttpSession;
 
@@ -20,6 +19,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,10 +28,14 @@ import com.rep.book.bookrepboot.dao.UserDao;
 import com.rep.book.bookrepboot.dto.UserDTO;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Service
 @Slf4j
 public class SignService {
+
+	@Value("${api.geo-key}")
+	private String GEO_KEY;
 	
 	@Autowired 
 	private UserDao userDao;
@@ -65,7 +69,7 @@ public class SignService {
 		return cnt;
 	}
 
-	public String[] applySignUp(String email, String name, String password, String address, String detail) throws IOException, ParseException, InterruptedException {
+	public String[] applySignUp(String email,String domain, String name, String password, String address, String detail) throws IOException, ParseException, InterruptedException {
 		log.info("applySignUp()");
 		
 		String msg = "회원가입 성공";
@@ -75,7 +79,8 @@ public class SignService {
 		Map<String, Double> pointMap = getPointByAddress(address);
 		Double longitude = pointMap.get("longitude");
 		Double latitude = pointMap.get("latitude");
-		UserDTO userDTO = new UserDTO(email, password, name, null, longitude, latitude, detail);
+		String fullEmail = email + "@" + domain;
+		UserDTO userDTO = new UserDTO(fullEmail, password, name, null, longitude, latitude, detail);
 		
 		try {
 			userDao.applySignUp(userDTO);
@@ -117,8 +122,17 @@ public class SignService {
 		return userDTO;
 	}
 
-	public void modify(List<MultipartFile> files, UserDTO userDTO, HttpSession session) throws Exception {
+	public void modify(List<MultipartFile> files, String email, String name, String password, String address, String detail, HttpSession session) throws Exception {
 		log.info("modify()");
+
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+		password = bCryptPasswordEncoder.encode(password);
+		Map<String, Double> pointMap = getPointByAddress(address);
+		Double longitude = pointMap.get("longitude");
+		Double latitude = pointMap.get("latitude");
+
+		UserDTO userDTO = new UserDTO(email, password, name, null, longitude, latitude, detail);
+
 		String upFile = null;
 		if (files != null && !files.isEmpty()) {
 			upFile = files.get(0).getOriginalFilename();
@@ -173,7 +187,7 @@ public class SignService {
 	public Map<String, Double> getPointByAddress(String address) throws IOException, InterruptedException, ParseException {
 		HttpClient client = HttpClient.newHttpClient();
 		String url = "https://api.vworld.kr/req/address?service=address&request=getCoord&key="
-				+ APIKEY.GEO_KEY
+				+ GEO_KEY
 				+ "&type=road"
 				+ "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8);
 		HttpRequest request = HttpRequest.newBuilder()
@@ -194,5 +208,27 @@ public class SignService {
 		map.put("longitude", x);
 		map.put("latitude", y);
 		return map;
+	}
+
+	public String pwdChangeProc(String password, HttpSession session, RedirectAttributes rttr) {
+		log.info("pwdChangeProc()");
+
+		String email = session.getAttribute("email").toString();
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+		password = bCryptPasswordEncoder.encode(password);
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("email", email);
+		map.put("password", password);
+		try {
+			userDao.pwdChangeProc(map);
+			rttr.addFlashAttribute("msg", "비밀번호가 변경되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			rttr.addFlashAttribute("msg", "비밀번호 변경에 실패했습니다.");
+		}
+		session.removeAttribute("email");
+		rttr.addFlashAttribute("msg", "비밀번호가 변경되었습니다.");
+
+		return "redirect:/";
 	}
 }

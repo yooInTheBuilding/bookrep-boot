@@ -2,6 +2,7 @@ package com.rep.book.bookrepboot.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,9 +13,7 @@ import com.rep.book.bookrepboot.dto.BookDTO;
 import com.rep.book.bookrepboot.dto.UserDTO;
 @Mapper
 public interface UserDao {
-	@Select("SELECT count(*) FROM user")
-	int getUserCnt();
-	
+
 	List<UserDTO> getUserList(String keyword);
 	
 	int signIn(Map<String, String> map);
@@ -35,6 +34,17 @@ public interface UserDao {
 
 	String getNameByEmail(String userEmail);
 
+	Optional<UserDTO> findUserByEmail(String username);
 
-	UserDTO findUserByEmail(String username);
+	void pwdChangeProc(Map<String, String> map);
+
+  List<UserDTO> getUserToSuperAdmin();
+
+  UserDTO getFirstUser(String firUserEmail);
+
+	UserDTO getSecondUser(String secUserEmail);
+  
+	List<UserDTO> getUserListByEmail(String keyword);
+
+	List<UserDTO> getUserListByName(String keyword);
 }

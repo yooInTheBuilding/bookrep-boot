@@ -12,14 +12,18 @@
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
+    <style>
+        .agreed-label {
+            font-size: 13px;
+        }
+    </style>
 </head>
 <body>
 <sec:authorize access="isAuthenticated()">
-    <jsp:include page="loggedHeader.jsp"></jsp:include>
+    <jsp:include page="loggedHeader.jsp"/>
 </sec:authorize>
 <sec:authorize access="!isAuthenticated()">
-    <jsp:include page="header.jsp"></jsp:include>
+    <jsp:include page="header.jsp"/>
 </sec:authorize>
 
 <div class="out-line">
@@ -32,7 +36,17 @@
                 <p>
                 <div class="int-area">
                     <input type="text" name="email" id="email" autocomplete="off"
-                           placeholder="email" onblur="checkId()" required> <br>
+                           placeholder="email" onblur="checkId()" required style="width: 70px">
+                    <span>@</span>
+                    <input type="text" name="domain" id="domain" style="width: 70px" required><br>
+                    <select name="domainList" id="domainList" onblur="checkId()" onchange="toggleInput()">
+                        <option value="naver.com">naver.com</option>
+                        <option value="gmail.com">gmail.com</option>
+                        <option value="daum.net">daum.net</option>
+                        <option value="nate.com">nate.com</option>
+                        <option value="self">직접 입력</option>
+                    </select>
+                    <br>
                     <span id="checkEmail"></span>
                 </div>
                 <p>
@@ -74,8 +88,30 @@
                 </div>
 
                 <p>
+                <div>
+                    <div>
+                        <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="agree" required disabled>
+                        <label for="agreedToTerms" class="agreed-label">[필수] 약관에 동의합니다.</label>
+                    </div>
+                    <div>
+                        <input type="button" id="terms" value="내용보기" onclick="openWindow('/sign-in-terms', 'agreedToTerms')"/>
+                    </div>
+                </div>
+
+                <p>
+                <div>
+                    <div>
+                        <input type="checkbox" id="agreedToPrivacyPolicy" name="agreedToPrivacyPolicy" value="agree" required disabled>
+                        <label for="agreedToPrivacyPolicy" class="agreed-label">[필수] 개인정보 처리 방침에 동의합니다.</label>
+                    </div>
+                    <div>
+                        <input type="button" id="privacyPolicy" value="내용보기" onclick="openWindow('/sign-in-privacy-policy', 'agreedToPrivacyPolicy')"/>
+                    </div>
+                </div>
+
+                <p>
                 <div class="signUp-page-button">
-                    <button>회원가입</button>
+                    <button id="sbtn">회원가입</button>
                 </div>
             </form>
 
@@ -87,19 +123,23 @@
     <fieldset>
         <div class="sign-up-link">
             <p>
-                이미 계정이 있나요? <a href="/sign-in">로그인</a>
+                이미 계정이 있나요? <a href="${pageContext.request.contextPath}/user/sign-in">로그인</a>
             <p>
         </div>
     </fieldset>
 </div>
+<jsp:include page="footer.jsp"/>
 </body>
 <script>
 
     function checkId() {
-
-        var email = $('#email').val(); //id값이 "id"인 입력란의 값을 저장
-
+        const first = $('#email').val();
+        const last = $('#domain').val();
+        const email = first + "@" + last; //id값이 "id"인 입력란의 값을 저장
+        console.log(email);
         var checkEmail = document.getElementById("checkEmail");
+        let disable = $('#sbtn').prop("disabled");
+        const pattern = /\s/g;
 
         $.ajax({
             url: 'emailCheck', //Controller에서 요청 받을 주소
@@ -109,19 +149,34 @@
             },
             success: function (cnt) { //컨트롤러에서 넘어온 cnt값을 받는다
                 if (cnt == 0) { //cnt가 1이 아니면(=0일 경우) -> 사용 가능한 아이디
-                    checkEmail.innerHTML = "사용 가능한 이메일입니다.";
+                    if (email.match(pattern)){
+                        checkEmail.innerText = "공백은 입력 불가합니다";
+                        $('#email').val('');
+                        disable = true;
+                    }else if(last === ""){
+                        checkEmail.innerText = "도메인을 입력해주세요";
+                        disable = true;
+                    } else if(first === ""){
+                        checkEmail.innerText = "이메일을 입력해주세요";
+                        disable = true;
+                    } else {
+                        checkEmail.innerHTML = "사용 가능한 이메일입니다.";
+                        disable = false;
+                    }
                 } else { // cnt가 1일 경우 -> 이미 존재하는 아이디
                     console.log(cnt);
                     checkEmail.innerHTML = "중복된 이메일이에요.";
                     alert("아이디를 다시 입력해주세요");
                     $('#email').val('');
+                    disable = true;
                 }
             },
             error: function () {
                 alert("에러입니다");
+                disable = true;
             }
         });
-    };
+    }
     function sample4_execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
@@ -176,5 +231,65 @@
             }
         }).open();
     }
+
+    function openWindow(url, id) {
+        var newWindow = window.open(url, "_blank", "width=600,height=400");
+        newWindow.onload = function() {
+            document.getElementById(id).disabled = false;
+        };
+    }
+    $(
+        function () {
+            let selection = $('#domainList').val();
+            if (selection === "self"){
+                    console.log("activateInput");
+                    let domain =  $('#domain');
+                    if (domain.prop('readonly') === true){
+                        domain.prop('readonly', false);
+                    }else {
+                        return;
+                    }
+                    domain.val("");
+            }else {
+                console.log("disableInput");
+                let domain =  $('#domain');
+                if (domain.prop('readonly') === false){
+                    domain.prop('readonly', true);
+                }
+                domain.val(selection);
+            }
+        }
+    );
+    function toggleInput(){
+        let selection = $('#domainList').val();
+        if (selection === "self"){
+                console.log("activateInput");
+                let domain =  $('#domain');
+                if (domain.prop('readonly') === true){
+                    domain.prop('readonly', false);
+                }else {
+                    return;
+                }
+                domain.val("");
+        }else {
+            console.log("disableInput");
+            let domain =  $('#domain');
+            if (domain.prop('readonly') === false){
+                domain.prop('readonly', true);
+            }
+            domain.val(selection);
+        }
+    }
+
+    $(
+        function (){
+            let msg = "${msg}";
+            if (msg !== "" && msg !== null){
+                alert(msg);
+            }
+        }
+    );
+
+
 </script>
 </html>

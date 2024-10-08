@@ -15,14 +15,14 @@
 <header>
     <div class="header">
         <div class="logo">
-            <img src="../resources/images/bookrepLogo.png" alt="로고"
+            <img src="../resources/images/newFullLogo.png" alt="로고"
                  onclick="return moveToHome()">
         </div>
         <div class="buttons">
             <c:choose>
                 <c:when test="${empty sessionScope.loggedEmail}">
                     <div class="login-button">
-                        <a href="/sign-in">
+                        <a href="${pageContext.request.contextPath}/user/sign-in">
                             <button>로그인</button>
                         </a>
                     </div>
@@ -30,13 +30,13 @@
                 <c:otherwise>
                     <!-- 세션에 로그인 정보가 있는 경우 -->
                     <div class="search-box">
-                        <form action="${pageContext.request.contextPath}/search" method="GET">
+                        <form action="${pageContext.request.contextPath}/user/search" method="GET">
                             <input type="text" name="query" placeholder="검색어를 입력하세요">
                             <button type="submit" class="search">search</button>
                         </form>
                     </div>
                     <div class="logout-button">
-                        <a href="/sign-out">
+                        <a href="${pageContext.request.contextPath}/sign-out">
                             <button>로그아웃</button>
                         </a>
                     </div>

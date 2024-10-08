@@ -36,7 +36,7 @@ public class HomeController {
 		return "home1";
 	}
 	
-	@GetMapping("/home")
+	@GetMapping("/user/home")
 	public String home(HttpSession session, Model model) {
     
 		String email = SecurityUtil.getCurrentUserEmail();
@@ -56,12 +56,27 @@ public class HomeController {
 		}
 	}
 	
-	@PostMapping("get-image")
+	@PostMapping("user/get-image")
 	@ResponseBody
 	public String getImage(@RequestParam("email") String email) {
 		log.info("getImage()");
 		String imageAjax = feedService.getUserImage(email);
 		return imageAjax;
 	}
+
+	@GetMapping("privacy-policy")
+	public String showPrivacyPolicy(){
+		log.info("showPrivacyPolicy()");
+		return "th/privacyPolicy";
+	}
+
+	@GetMapping("terms")
+	public String showTerms(){
+		log.info("showTerms");
+		return "th/terms";
+	}
+
+	@GetMapping("contact-us")
+	public String showContactUs(){ return "th/contactUs"; }
 }
 

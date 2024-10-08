@@ -17,10 +17,10 @@
 </head>
 <body>
 <sec:authorize access="isAuthenticated()">
-    <jsp:include page="loggedHeader.jsp"></jsp:include>
+    <jsp:include page="loggedHeader.jsp"/>
 </sec:authorize>
 <sec:authorize access="!isAuthenticated()">
-    <jsp:include page="header.jsp"></jsp:include>
+    <jsp:include page="header.jsp"/>
 </sec:authorize>
 <input type="hidden" value="${isBookmark}" id="isBookmark">
 <div id="total-body">
@@ -67,10 +67,10 @@
                                     <div class="report-content">
                                         <div>
                                             <div class="report-user">
-                                                <a href="/feed/${report.userEmail}">${report.userEmail}</a>
+                                                <a href="/user/feed/${report.userEmail}">${report.userEmail}</a>
                                             </div>
                                             <div class="report-title">
-                                                <a href="/report-detail?id=${report.id}">${report.title}</a>
+                                                <a href="${pageContext.request.contextPath}/user/report-detail?id=${report.id}">${report.title}</a>
                                             </div>
                                         </div>
                                         <div>
@@ -120,6 +120,7 @@
            class="page-link">▶|</a>
     </div>
 </div>
+<jsp:include page="footer.jsp"/>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script type="text/javascript">
@@ -131,7 +132,7 @@
 
         $.ajax({
             type: "POST",
-            url: "<%=request.getContextPath()%>/bookmark",
+            url: "<%=request.getContextPath()%>/user/bookmark",
             data: {isbn: "${book.isbn}"},
             success: function (response) {
                 if (isBookmark) {

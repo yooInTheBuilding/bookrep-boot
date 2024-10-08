@@ -32,20 +32,10 @@ public class SignController {
 	SignService signService;
 
 	// 로그인 이동
-	@GetMapping("sign-in")
+	@GetMapping("/user/sign-in")
 	public String showSignIn() {
 		log.info("로그인 화면 이동");
 		return "signIn";
-	}
-
-	// 로그인 로직
-	@PostMapping("sign-in-proc")
-	public String signIn(HttpSession session, @RequestParam String username, @RequestParam String password) {
-		log.info("email:{}, pw:{}", username, password);
-
-		String view = signService.signIn(session, username, password);
-		log.info(view);
-		return view;
 	}
 
 	// 로그아웃 로직
@@ -76,15 +66,25 @@ public class SignController {
 	@PostMapping("sign-up")
 	public String applySignUp(
 			@RequestParam("email") String email,
+			@RequestParam("domain") String domain,
+			@RequestParam("domainList") String domainList,
 			@RequestParam("name") String name,
 			@RequestParam("password") String password,
 			@RequestParam("address") String address,
 			@RequestParam("detail") String detail,
+			@RequestParam(required = false) String agreedToTerms,
+			@RequestParam(required = false) String agreedToPrivacyPolicy,
 			RedirectAttributes rttr) throws IOException, ParseException, InterruptedException {
 		
 		log.info("applySignUp()");
-		
-		String[] arr =  signService.applySignUp(email, name, password, address, detail);
+
+		if (agreedToTerms == null || agreedToPrivacyPolicy == null ||
+				!agreedToTerms.equals("agree") || !agreedToPrivacyPolicy.equals("agree")) {
+			rttr.addFlashAttribute("msg", "약관에 동의해주세요.");
+			return "redirect:/sign-up";
+		}
+
+		String[] arr =  signService.applySignUp(email,domain, name, password, address, detail);
 		
 		rttr.addFlashAttribute("msg", arr[0]);
 		
@@ -108,7 +108,7 @@ public class SignController {
 		return result;
 	}
 	
-	@GetMapping("update")
+	@GetMapping("user/update")
 	public String showModify(HttpSession session, Model model) {
 		log.info("showModify()");
 		
@@ -118,16 +118,34 @@ public class SignController {
 		return "update";
 	}
 	
-	@PostMapping("update")
-	public String modify(@RequestPart List<MultipartFile> files, UserDTO userDTO, HttpSession session) throws Exception {
+	@PostMapping("user/update")
+	public String modify(@RequestPart List<MultipartFile> files,
+						 @RequestParam("email") String email,
+						 @RequestParam("name") String name,
+						 @RequestParam("password") String password,
+						 @RequestParam("address") String address,
+						 @RequestParam("detail") String detail,
+						 @RequestParam("mailConfirm") String mailConfirm,
+						 HttpSession session, RedirectAttributes rttr) throws Exception {
 		log.info("modify()");
-		
-		signService.modify(files, userDTO, session);
-		
-		return "redirect:/";
+
+		if (mailConfirm == null || !mailConfirm.equals("true")) {
+			rttr.addFlashAttribute("msg", "메일인증 해주세요");
+			return "redirect:/user/update";
+		}
+
+		try {
+			signService.modify(files, email, name, password, address, detail, session);
+			rttr.addFlashAttribute("msg", "회원정보 수정이 완료되었습니다.");
+		} catch (Exception e){
+			rttr.addFlashAttribute("msg", "회원정보 수정이 실패하였습니다.");
+			return "redirect:/user/update";
+		}
+
+		return "redirect:/user/feed/" + email;
 	}
 	
-	@GetMapping("resign")
+	@GetMapping("user/resign")
 	public String resign(HttpSession session) {
 		log.info("resign()");
 		
@@ -135,10 +153,34 @@ public class SignController {
 		
 		return "redirect:/";
 	}
-	
-	
-	
-	
-	
+
+	@GetMapping("pwd-change")
+	public String pwdChange(){
+		log.info("pwdChange");
+
+		return "th/pwdChange";
+	}
+
+	@PostMapping("pwd-change-proc")
+	public String pwdChangeProc(@RequestParam String password,
+								@RequestParam String fucku,
+								HttpSession session,
+								RedirectAttributes rttr) {
+		log.info("pwdChangeProc");
+
+		return signService.pwdChangeProc(password, session, rttr);
+	}
+
+	@GetMapping("sign-in-terms")
+	public String showSigInInTerms(){
+		log.info("showTerms");
+		return "th/signInTerms";
+	}
+
+	@GetMapping("sign-in-privacy-policy")
+	public String showSignInPrivacyPolicy(){
+		log.info("showPrivacyPolicy()");
+		return "th/signInPrivacyPolicy";
+	}
 	
 }

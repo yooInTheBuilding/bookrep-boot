@@ -14,6 +14,11 @@
             alert(m);
         }
     });
+    $(document).ready(function() {
+        if (isAuthenticated()) {
+            location.href = "/user/home";
+        }
+    });
 </script>
 <head>
     <meta charset="UTF-8">
@@ -26,13 +31,15 @@
 </head>
 <body>
 <sec:authorize access="isAuthenticated()">
-    <jsp:include page="loggedHeader.jsp"></jsp:include>
+    <jsp:include page="loggedHeader.jsp"/>
 </sec:authorize>
 <sec:authorize access="!isAuthenticated()">
-    <jsp:include page="header.jsp"></jsp:include>
+    <jsp:include page="header.jsp"/>
 </sec:authorize>
-<div class="mainLogo">
-    <img alt="mainLogo" src="resources/images/newFullLogo.png">
+<div class="mainLogo" style="text-align: center;">
+    <img alt="mainLogo" src="<%=request.getContextPath()%>/resources/images/newFullLogo.png"
+         style="width: 750px;height: 750px; padding-top: 50px;">
 </div>
+<jsp:include page="footer.jsp"/>
 </body>
 </html>

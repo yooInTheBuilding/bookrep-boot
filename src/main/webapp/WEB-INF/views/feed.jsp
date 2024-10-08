@@ -15,25 +15,29 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <link rel="stylesheet"
           href="<%=request.getContextPath()%>/resources/css/page.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous">
+    </script>
+    <script>
+        $(function () {
+            let msg = "${msg}";
+            if (msg !== "" && msg !== null) {
+                alert(msg);
+            }
+        });
+    </script>
 </head>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous">
-</script>
 <body>
 <sec:authorize access="isAuthenticated()">
-    <jsp:include page="loggedHeader.jsp"></jsp:include>
+    <jsp:include page="loggedHeader.jsp"/>
 </sec:authorize>
 <sec:authorize access="!isAuthenticated()">
-    <jsp:include page="header.jsp"></jsp:include>
+    <jsp:include page="header.jsp"/>
 </sec:authorize>
 <input type="hidden" value="${isFollowing}" id="isFollowing">
 <input type="hidden" value="${userEmail}" id="currentEmail">
 <div id="total-body">
-    <!--
-     세션 연결 후 확인해 볼것.
-     유저정보들(팔로워 팔로잉, 북마크, 유저정보수정,
-   -->
 
     <div class="user-info">
         <div class="user-image-container">
@@ -55,23 +59,43 @@
                         </button>
                     </c:otherwise>
                 </c:choose>
-                <a href="/bookmark/${userEmail}"> <img class="bookmark-image"
-                                                       class="top-line-margin" alt="bookmark"
-                                                       src="../resources/images/bookmark_icon_black.png"
-                                                       style="width: 30px; height: 30px;"></a>
+                <a href="/user/bookmark/${userEmail}">
+                    <img class="bookmark-image"
+                         class="top-line-margin" alt="bookmark"
+                         src="<%=request.getContextPath()%>/resources/images/bookmark_icon_black.png"
+                         style="width: 30px; height: 30px;"></a>
             </div>
-            <div class="user-name">${name}</div>
+            <div style="display: flex; align-items: center; margin-top: 10px;">
+                <div class="user-name">${name}</div>
+                <div style="margin-left: 10px;">
+                    <c:choose>
+                        <c:when test="${isCurrentUser}">
+                            <a href="${pageContext.request.contextPath}/user/my-share"
+                               style="color: #333333; text-decoration: none;">myShare</a>
+                        </c:when>
+                    </c:choose>
+                </div>
+                <div style="margin-left: 30px;">
+                    <c:choose>
+                        <c:when test="${isCurrentUser}">
+                            <a href="${pageContext.request.contextPath}/user/my-trade-status"
+                               style="color: #333333; text-decoration: none;">교환상태</a>
+                        </c:when>
+                    </c:choose>
+                </div>
+            </div>
+
             <br>
             <div class="bottom-line">
                 <div class="bottom-line-margin">
                     <span style="margin-right: 10%">Posts</span><span>${reportValue}</span>
                 </div>
                 <div class="bottom-line-margin">
-                    <a class="f-a" href="/follower/${userEmail}" style="margin-right: 10%">팔로워</a><span
+                    <a class="f-a" href="/user/follower/${userEmail}" style="margin-right: 10%">팔로워</a><span
                         id="follower">${followerCnt}</span>
                 </div>
                 <div class="bottom-line-margin">
-                    <a class="f-a" href="/following/${userEmail}" style="margin-right: 10%">팔로잉</a><span
+                    <a class="f-a" href="/user/following/${userEmail}" style="margin-right: 10%">팔로잉</a><span
                         id="following">${followingCnt}</span>
                 </div>
             </div>
@@ -109,7 +133,7 @@
                                 <p>${report.report.title}</p>
                                 <p>${report.report.userEmail}</p>
                                 <p>좋아요 수: ${report.like}</p>
-                                <a href="/report-detail?id=${report.report.id}">독후감
+                                <a href="${pageContext.request.contextPath}/user/report-detail?id=${report.report.id}">독후감
                                     상세보기</a>
                             </div>
                         </div>
@@ -125,7 +149,7 @@
 
             <!-- 이전 버튼 -->
             <c:if test="${currentPageNum > 3}">
-                <a href="?pageNum=${currentPageNum - 5}" class="page-link">이전</a>
+                <a href="?pageNum=${currentPageNum - 3}" class="page-link">이전</a>
             </c:if>
 
             <!-- 페이지 번호 5개씩 표시 -->
@@ -152,11 +176,12 @@
         </div>
     </c:if>
 </div>
+<jsp:include page="footer.jsp"/>
 </body>
 
 <script type="text/javascript">
     function showModify() {
-        window.location.href = "/update";
+        window.location.href = "/user/update";
     }
 
     var userEmail = document.getElementById("currentEmail").value;
@@ -164,7 +189,6 @@
     var isFollowing = JSON.parse(document.getElementById("isFollowing").value);
     console.log(isFollowing);
     var button = document.getElementById("followBtn");
-    console.log(button.innerText);
     var follower = document.getElementById("follower");
     var followerCount = parseInt(follower.innerText);
     console.log(typeof followerCount === 'number');
@@ -190,7 +214,7 @@
     function follow(userEmail) {
         $.ajax({
             type: 'post',
-            url: '/follow',
+            url: '/user/follow',
             data: {
                 email: userEmail
             },
@@ -206,7 +230,7 @@
     function unfollow(userEmail) {
         $.ajax({
             type: 'post',
-            url: '/unfollow',
+            url: '/user/unfollow',
             data: {
                 email: userEmail
             },

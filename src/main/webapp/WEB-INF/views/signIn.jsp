@@ -1,4 +1,4 @@
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+    <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -6,17 +6,17 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
-    <link rel="stylesheet" href="resources/css/signIn.css">
+    <link rel="stylesheet" href="../resources/css/signIn.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
 </head>
 <body>
 <sec:authorize access="isAuthenticated()">
-    <jsp:include page="loggedHeader.jsp"></jsp:include>
+    <jsp:include page="loggedHeader.jsp"/>
 </sec:authorize>
 <sec:authorize access="!isAuthenticated()">
-    <jsp:include page="header.jsp"></jsp:include>
+    <jsp:include page="header.jsp"/>
 </sec:authorize>
 
 <div class="out-line">
@@ -26,7 +26,7 @@
 
             <h1>로그인</h1>
 
-            <form action="${pageContext.request.contextPath}/sign-in-proc" method="post">
+            <form action="/user/sign-in-proc" method="post">
                 <p>
                 <div class="int-area">
                     <input type="text" name="username" id="email" autocomplete="off"
@@ -62,5 +62,6 @@
         </div>
     </fieldset>
 </div>
+<jsp:include page="footer.jsp"/>
 </body>
 </html>

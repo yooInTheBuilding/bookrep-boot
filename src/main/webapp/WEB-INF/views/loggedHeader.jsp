@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>로그인헤더</title>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/loggedHeader.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
@@ -21,7 +21,7 @@
 			<div class="profile">
 					<sec:authorize access="isAuthenticated()">
 						<sec:authentication property="principal" var="principal"/>
-						<a href="/feed/${principal.username}" id="userImage"></a>
+						<a href="/user/feed/${principal.username}" id="userImage"></a>
 					</sec:authorize>
 					<sec:authorize>
 						<i class="fa fa-user-circle-o fa-2x" aria-hidden="true"></i>
@@ -31,21 +31,29 @@
 			<div class="write-button">
 				<button onclick="moveToWrite()">글 쓰기</button>
 			</div>
+			<div class="write-button">
+				<button onclick="moveToMyShare()">My Share</button>
+			</div>
+			<div class="write-button">
+				<button onclick="moveToShareHouse()">Share House</button>
+			</div>
 
-			<div class="logo">
-				<img
-					src="<%=request.getContextPath()%>/resources/images/bookrepLogo.png"
+			<div class="logo" id="headerCenterContent">
+				<img src="<%=request.getContextPath()%>/resources/images/newFullLogo.png"
 					alt="로고" onclick="moveToHome()">
+				<div id="headerLogoText">
+					<h5>BOOKREP</h5>
+				</div>
 			</div>
 			<div class="buttons">
 				<div class="search-box">
-					<form action="/search" method="GET">
+					<form action="${pageContext.request.contextPath}/user/search" method="GET">
 						<input type="text" name="keyword" placeholder="검색어를 입력하세요">
 						<button type="submit" class="search">검색</button>
 					</form>
 				</div>
 				<div class="logout-button">
-					<a href="/sign-out"><button>로그아웃</button></a>
+					<a href="${pageContext.request.contextPath}/user/sign-out"><button>로그아웃</button></a>
 				</div>
 			</div>
 		</div>
@@ -55,7 +63,7 @@
 	var logggggggggggemail = "${principal.username}";
 	var userImage = document.getElementById("userImage");
 	$.ajax({
-		url : '<%=request.getContextPath()%>/get-image',
+		url : '<%=request.getContextPath()%>/user/get-image',
 		type : 'post', 
 		data : {
 			email : logggggggggggemail
@@ -71,10 +79,10 @@
 	});
 	const moveToHome = () => {
 
-		var email = "${sessionScope.email}";
+		var email = "${principal.username}";
 		
 		if(email != null) {
-			location.href = "/home";
+			location.href = "/user/home";
 		} else {
 			location.href = "/";
 		}
@@ -82,15 +90,23 @@
 	
 	const moveToFeed = () => {
 		
-		var email1 = "${sessionScope.email}"; 
+		var email1 = "${principal.username}";
 		
 		if(email1 != null){
-			location.href = "/feed";
+			location.href = "/user/feed";
 		}
 	}
 	
 	const moveToWrite = () => {
-		location.href = "/write";
+		location.href = "/user/write";
+	}
+
+	const moveToShareHouse = () => {
+		location.href = "/user/share-house";
+	}
+
+	const moveToMyShare = () => {
+		location.href = "/user/my-share";
 	}
 	
 </script>

@@ -13,10 +13,10 @@
 </head>
 <body>
 	<sec:authorize access="isAuthenticated()">
-		<jsp:include page="loggedHeader.jsp"></jsp:include>
+		<jsp:include page="loggedHeader.jsp"/>
 	</sec:authorize>
 	<sec:authorize access="!isAuthenticated()">
-		<jsp:include page="header.jsp"></jsp:include>
+		<jsp:include page="header.jsp"/>
 	</sec:authorize>
 	<!-- 현재 페이지 설정 -->
 	<c:choose>
@@ -32,6 +32,12 @@
 		</c:otherwise>
 	</c:choose>
 
+	<c:if test="${empty sessionItems}">
+		<br><br><br><br><br><br><br><br>
+		<div style="text-align: center">팔로우한 유저가 없습니다.</div>
+		<br><br><br><br><br><br><br><br>
+	</c:if>
+
 	<!-- 현재 페이지 번호와 일치하는 독후감 등을 출력하는 부분 -->
 	<c:if test="${not empty sessionItems}">
 		<c:forEach var="page" items="${sessionItems}">
@@ -40,7 +46,7 @@
 					<c:forEach var="report" items="${page.objectList}">
 						<div class="report-con">
 							<div class="report-container">
-								<a href="/feed/${report.userEmail}"><p>${report.userEmail}</p></a>
+								<a href="/user/feed/${report.userEmail}"><p>${report.userEmail}</p></a>
 								<div class="report-detail"
 									onclick="moveToReportDetail(${report.id})">
 									<p>${report.title}</p>
@@ -88,10 +94,11 @@
 			<a href="?pageNum=${sessionItems.size()}" class="page-link">▶|</a>
 		</div>
 	</c:if>
+	<jsp:include page="footer.jsp"/>
 </body>
 <script type="text/javascript">
 function moveToReportDetail(reportId) {
-	location.href = "/report-detail?id=" + reportId;
+	location.href = "/user/report-detail?id=" + reportId;
 }
 </script>
 </html>

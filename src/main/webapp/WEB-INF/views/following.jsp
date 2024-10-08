@@ -18,10 +18,10 @@
 </script>
 <body>
 <sec:authorize access="isAuthenticated()">
-    <jsp:include page="loggedHeader.jsp"></jsp:include>
+    <jsp:include page="loggedHeader.jsp"/>
 </sec:authorize>
 <sec:authorize access="!isAuthenticated()">
-    <jsp:include page="header.jsp"></jsp:include>
+    <jsp:include page="header.jsp"/>
 </sec:authorize>
 
 <h1 id="search-title">"${email}"님의 팔로잉 목록</h1>
@@ -36,12 +36,12 @@
             <ul>
                 <c:forEach items="${followingList}" var="following">
                     <li class="display">
-                        <a href="/feed/${following.email}">
+                        <a href="/user/feed/${following.email}">
                                 ${following.email} </a>
-                        <a href="/feed/${following.email}">
+                        <a href="/user/feed/${following.email}">
                                 ${following.name} </a>
                         <br>
-                        <a href="/feed/${following.email}">
+                        <a href="/user/feed/${following.email}">
                             <img src="<%=request.getContextPath()%>/resources/images/${following.image}"></a>
                     </li>
                 </c:forEach>
@@ -63,7 +63,6 @@
                 class="page-link">다음</a>
     </c:if>
 </div>
-
-
+<jsp:include page="footer.jsp"/>
 </body>
 </html>

@@ -27,15 +27,15 @@ public class ReportRController {
 	@Autowired
 	private ReportRService reportRService; 
 	
-	@GetMapping("report-detail")
-	public String showReportDetail(@RequestParam("id") Long id, HttpSession session,Model model) {
+	@GetMapping("user/report-detail")
+	public String showReportDetail(@RequestParam("id") Long id, Model model) {
 		log.info("showReportDetail()");
 		
 		String loggedInUserEmail = SecurityUtil.getCurrentUserEmail();
 		
 		ReportDTO reportDTO = reportRService.getReportDetailByReportId(id);
 		List<CommentDTO> commentList = reportRService.getCommentByReportId(id);
-		List<PageDTO> pageList = MainUtil.setPaging(commentList, 6);
+		List<PageDTO> pageList = MainUtil.setPaging(commentList, 5);
 		Integer likeValue = reportRService.getLikeValueByReportId(id);
 		Integer isLike = reportRService.isLike(loggedInUserEmail, id);
 		
@@ -48,12 +48,13 @@ public class ReportRController {
 		model.addAttribute("commentList", pageList);
 		model.addAttribute("likeValue", likeValue);
 		model.addAttribute("isLike", isLikeBool);
+		model.addAttribute("loggedInUserEmail", loggedInUserEmail);
 		
 		
 		return "reportDetail";
 	}
 	
-	@PostMapping("like")
+	@PostMapping("user/like")
 	public String setLike(@RequestParam("id") Long id, HttpSession session) {
 		log.info("setLike()");
 		
@@ -64,7 +65,7 @@ public class ReportRController {
 		return "redirect:report-detail?id=" + id;
 	}
 	
-	@PostMapping("comment")
+	@PostMapping("user/comment")
 	public String setComment(@RequestParam("id") Long id, HttpSession session, @RequestParam("comment") String comment) {
 		log.info("setComment()");
 		
@@ -74,12 +75,5 @@ public class ReportRController {
 		
 		return "redirect:report-detail?id=" + id;
 	}
-	
-	
-	
-	
-	
-	
-	
 	
 }
