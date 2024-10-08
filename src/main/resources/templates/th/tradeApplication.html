@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/customer.css}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <title>tradeApplication</title>
+</head>
+<body>
+<header>
+    <th:blcok th:insert="~{th/customerHeader::header(user)}"></th:blcok>
+</header>
+알수없음
+<section>
+    <div id="tradeApplication">
+        <div id="tradeApplication_fullContents">
+            <div id="tradeApplication_Contents_00">
+                <div id="tradeApplication_contents_01">
+                    <div id="tradeApplication_contents_imgBox">
+                        <img th:src="${firstBook.getImage()}" alt="">
+                    </div>
+                    <div id="tradeApplication_contents_detailBox1">
+                        <div>
+                            <div th:text="${firstTrade.getUser_email()}"/>
+                        </div>
+                        <div>
+                            <div th:text="${firstBook.getName()}"/>
+                        </div>
+                        <div>
+                            <div th:text="${firstBook.getAuthor()}"/>
+                        </div>
+                        <div>
+                            <div th:text="${firstBook.getPublisher()}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="blankSpace">
+            </div>
+
+            <th:block th:if="${book == null}">
+                <div id="tradeApplication_BookSelectLink">
+                    <a th:href="@{/user/book-select(checkNum=2, id=${id})}">
+                        <div id="tradeApplication_BookSelectLink-hover">
+                            <div id="tradeApplication-fullDummySelectContents">
+                                <div id="tradeApplication-fullDummySelectContents-imgBox">
+                                    <img th:src="@{/images/no_book.jpg}" alt="">
+                                </div>
+                                <div id="tradeApplication-fullDummySelectContents-bottom">
+                                    <div>
+                                        <span>이메일:Unknown</span>
+                                    </div>
+                                    <div>
+                                        <span>재목:Unknown</span>
+                                    </div>
+                                    <div>
+                                        <span>저자:Unknown</span>
+                                    </div>
+                                    <div>
+                                        <span>출판사:Unknown</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <img th:src="@{/images/add.png}" alt="" id="addimg">
+                        </div>
+                    </a>
+                </div>
+            </th:block>
+            <th:block th:unless="${book == null}">
+                <form action="/user/send-trade-msg" method="post" id="sendTradeForm">
+                    <div id="tradeApplication_contents_02">
+                        <div th:if="${book != null}" id="tradeApplication_contents_imgBox2">
+                            <img th:src="${book.image}" alt="" style="width: 150px; height: 200px;">
+                        </div>
+                        <input type="hidden" name="book_trade_id" th:value="${firstTrade.getBook_trade_id()}">
+                        <input type="hidden" name="received_user_email" th:value="${firstTrade.getUser_email()}">
+                        <input type="hidden" name="sent_user_email" th:value="${userEmail}">
+                        <input type="hidden" name="received_book_isbn" th:value="${firstTrade.getBook_isbn()}">
+                        <input type="hidden" name="sent_book_isbn" th:value="${book != null ? book.isbn : ''}">
+                        <div id="tradeApplication_contents_detailBox2">
+                            <div>
+                                <div th:text="${userEmail}"/>
+                            </div>
+                            <div>
+                                <div th:text="${book != null ? '도서명: ' + book.name : ''}"/>
+                            </div>
+                            <div>
+                                <div th:text="${book != null ? '저자 : ' + book.author : ''}"/>
+                            </div>
+                            <div>
+                                <div th:text="${book != null ? '출판사: ' + book.publisher : ''}"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </th:block>
+        </div>
+        <button id="submitSendTradeButton">교환신청</button>
+    </div>
+</section>
+<footer>
+    <th:blcok th:insert="~{th/footer}"></th:blcok>
+</footer>
+<script th:inline="javascript">
+    $('#submitSendTradeButton').on('click', function () {
+        $('#sendTradeForm').submit();
+    });
+</script>
+</body>
+</html>
