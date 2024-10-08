@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.rep.book.bookrepboot.APIKEY;
 import com.rep.book.bookrepboot.util.SecurityUtil;
 import jakarta.servlet.http.HttpSession;
 
@@ -20,6 +19,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +33,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Service
 @Slf4j
 public class SignService {
+
+	@Value("${api.geo-key}")
+	private String GEO_KEY;
 	
 	@Autowired 
 	private UserDao userDao;
@@ -184,7 +187,7 @@ public class SignService {
 	public Map<String, Double> getPointByAddress(String address) throws IOException, InterruptedException, ParseException {
 		HttpClient client = HttpClient.newHttpClient();
 		String url = "https://api.vworld.kr/req/address?service=address&request=getCoord&key="
-				+ APIKEY.GEO_KEY
+				+ GEO_KEY
 				+ "&type=road"
 				+ "&address=" + URLEncoder.encode(address, StandardCharsets.UTF_8);
 		HttpRequest request = HttpRequest.newBuilder()

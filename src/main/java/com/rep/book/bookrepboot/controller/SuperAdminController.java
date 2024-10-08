@@ -55,7 +55,9 @@ public class SuperAdminController {
     }
 
     @PostMapping("super-admin/match-driver")
-    public String matchDriver(@RequestParam("path-id") Long pathId, @RequestParam("admin-id") Long adminId, @RequestParam("current-admin") Long currentAdminId){
+    public String matchDriver(@RequestParam("path-id") Long pathId,
+                              @RequestParam("admin-id") Long adminId,
+                              @RequestParam("current-admin") Long currentAdminId){
         log.info("matchDriver()");
 
         superAdminService.matchDriver(pathId, adminId);
@@ -64,7 +66,8 @@ public class SuperAdminController {
     }
 
     @GetMapping("super-admin/delivery-detail")
-    public String deliveryDetail(@RequestParam("path-id") Long pathId, Model model) throws IOException, ParserConfigurationException, InterruptedException {
+    public String deliveryDetail(@RequestParam("path-id") Long pathId, Model model)
+            throws IOException, ParserConfigurationException, InterruptedException {
         log.info("deliveryDetail()");
 
         superAdminService.getPathDetail(pathId, model);

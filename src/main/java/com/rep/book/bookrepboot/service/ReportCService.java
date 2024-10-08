@@ -13,12 +13,12 @@ import com.rep.book.bookrepboot.util.SecurityUtil;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rep.book.bookrepboot.APIKEY;
 import com.rep.book.bookrepboot.dao.BookDao;
 import com.rep.book.bookrepboot.dao.ReportDao;
 import com.rep.book.bookrepboot.dto.BookDTO;
@@ -29,6 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class ReportCService {
+
+	@Value("${api.id}")
+	private String API_ID;
+
+	@Value("${api.secret}")
+	private String API_SECRET;
 	
 	@Autowired
 	private ReportDao reportDao;
@@ -44,8 +50,8 @@ public class ReportCService {
 				+ "?query=" + URLEncoder.encode(keyword, "UTF-8")
 				+ "&display=100";
 		HttpRequest request = HttpRequest.newBuilder()
-				.header("X-Naver-Client-Id", APIKEY.ID)
-				.header("X-Naver-Client-Secret", APIKEY.SECRET)
+				.header("X-Naver-Client-Id", API_ID)
+				.header("X-Naver-Client-Secret", API_SECRET)
 				.uri(URI.create(url))
 				.GET()
 				.build();
